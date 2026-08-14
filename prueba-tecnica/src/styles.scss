@@ -1,1 +1,34 @@
-/* You can add global styles to this file, and also import other style files */
+:root {
+  --bg-dark: #0d0f12;
+  --card-dark: #181b20;
+  --yellow-accent: #facc15;
+  --text-muted: #8e95a2;
+}
+
+body {
+  background-color: var(--bg-dark);
+  color: #ffffff;
+  font-family: 'Open Sans', sans-serif;
+}
+
+.bg-cargo-card {
+  background-color: var(--card-dark);
+  border-radius: 16px;
+  border: 1px solid #282c34;
+}
+
+.btn-yellow {
+  background-color: var(--yellow-accent);
+  color: #000;
+  font-weight: 700;
+  border-radius: 20px;
+  border: none;
+  &:disabled {
+    background-color: #383c44;
+    color: #71757e;
+  }
+}
+
+.text-yellow {
+  color: var(--yellow-accent) !important;
+}

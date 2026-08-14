@@ -1,29 +1,67 @@
-<div class="container py-4">
-  <h2 class="mb-4 font-weight-bold">Pedidos</h2>
-
-  <!-- Spinner de carga -->
-  <div *ngIf="isLoading" class="text-center my-5">
-    <div class="spinner-border text-primary" role="status">
-      <span class="visually-hidden">Cargando...</span>
-    </div>
+<div class="container py-4 text-white" style="max-width: 480px;">
+  <!-- Header -->
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <i class="bi bi-chevron-left cursor-pointer"></i>
+    <h5 class="m-0 fw-bold">Cargo Orders</h5>
+    <i class="bi bi-bell text-yellow"></i>
   </div>
 
-  <!-- Mensaje de error -->
-  <div *ngIf="errorMsg" class="alert alert-danger" role="alert">
-    {{ errorMsg }}
+  <!-- Tabs -->
+  <div class="d-flex justify-content-around mb-3 border-bottom border-secondary pb-2">
+    <span [class.text-yellow]="activeTab==='upcoming'" class="fw-bold cursor-pointer" (click)="activeTab='upcoming'; fetchOrders()">Upcoming</span>
+    <span [class.text-yellow]="activeTab==='completed'" class="text-muted cursor-pointer" (click)="activeTab='completed'; fetchOrders()">Completed</span>
+    <span [class.text-yellow]="activeTab==='past'" class="text-muted cursor-pointer" (click)="activeTab='past'; fetchOrders()">Past</span>
   </div>
 
-  <!-- Lista con Grid de Bootstrap (Responsive) -->
-  <div *ngIf="!isLoading && orders.length > 0" class="row g-3">
-    <div *ngFor="let order of orders" class="col-12 col-md-6 col-lg-4">
-      <div class="card h-100 border-0 shadow-sm p-3">
-        <div class="d-flex align-items-center">
-          <app-avatar [imageUrl]="order.image" [name]="order.name || order.customerName || 'Cliente'" [size]="55"></app-avatar>
-          <div class="ms-3">
-            <h6 class="mb-1 fw-bold">{{ order.name || order.customerName || 'Pedido sin nombre' }}</h6>
-            <p class="text-muted small mb-0">{{ order.description || order.status || 'Sin detalle' }}</p>
-          </div>
+  <!-- 1. Buscador -->
+  <div class="mb-4">
+    <input 
+      type="text" 
+      class="form-control bg-cargo-card text-white border-0 py-2" 
+      placeholder="Search.." 
+      [(ngModel)]="searchTerm" 
+      (input)="applyFilter()"
+    >
+  </div>
+
+  <!-- Lista de Órdenes -->
+  <div *ngFor="let order of filteredOrders" class="mb-4">
+    <p class="small text-muted mb-2">Order <strong class="text-white">#{{ order.order_number || order.id }}</strong></p>
+
+    <div class="bg-cargo-card p-3">
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <span class="fw-bold"><i class="bi bi-truck me-2"></i>{{ order.type || 'FCL' }}</span>
+        <span class="badge bg-primary rounded-pill">{{ order.status_text || 'In transit' }}</span>
+      </div>
+
+      <!-- Destinos (Pickup / Dropoff) -->
+      <div class="small mb-3 ps-2 border-start border-secondary">
+        <div class="mb-2">
+          <small class="text-muted d-block">PICKUP</small>
+          <div><strong>{{ order.pickup?.city || 'New York' }}</strong></div>
+          <small class="text-muted">{{ order.pickup?.address }}</small>
         </div>
+        <div>
+          <small class="text-muted d-block">DROPOFF</small>
+          <div><strong>{{ order.dropoff?.city || 'New York' }}</strong></div>
+          <small class="text-muted">{{ order.dropoff?.address }}</small>
+        </div>
+      </div>
+
+      <!-- 2. Botón con temporizador & 3. Botón Resume -->
+      <div class="d-flex justify-content-between align-items-center mt-3">
+        <button 
+          class="btn btn-sm btn-outline-light rounded-pill px-3" 
+          [disabled]="!isPickupReady(order.start_date)"
+          (click)="onStartPickup(order)"
+        >
+          <span *ngIf="!isPickupReady(order.start_date)">Start pickup in {{ getRemainingTime(order.start_date) }}</span>
+          <span *ngIf="isPickupReady(order.start_date)">Its time for pickup</span>
+        </button>
+
+        <button class="btn btn-yellow btn-sm px-3" (click)="goToDetails(order.id)">
+          Resume <i class="bi bi-eye-fill ms-1"></i>
+        </button>
       </div>
     </div>
   </div>
