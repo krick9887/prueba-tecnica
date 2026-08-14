@@ -13,11 +13,11 @@
     <span [class.text-yellow]="activeTab==='past'" class="text-muted cursor-pointer" (click)="activeTab='past'; fetchOrders()">Past</span>
   </div>
 
-  <!-- 1. Buscador -->
+  <!-- 1. Buscador por order_number -->
   <div class="mb-4">
     <input 
       type="text" 
-      class="form-control bg-cargo-card text-white border-0 py-2" 
+      class="form-control bg-cargo-card text-white border-0 py-2 ps-3" 
       placeholder="Search.." 
       [(ngModel)]="searchTerm" 
       (input)="applyFilter()"
@@ -26,43 +26,53 @@
 
   <!-- Lista de Órdenes -->
   <div *ngFor="let order of filteredOrders" class="mb-4">
-    <p class="small text-muted mb-2">Order <strong class="text-white">#{{ order.order_number || order.id }}</strong></p>
+    <p class="small text-muted mb-2">Order <strong class="text-white">#{{ order.order_number }}</strong></p>
 
     <div class="bg-cargo-card p-3">
+      <!-- Encabezado de la Tarjeta -->
       <div class="d-flex justify-content-between align-items-center mb-3">
-        <span class="fw-bold"><i class="bi bi-truck me-2"></i>{{ order.type || 'FCL' }}</span>
-        <span class="badge bg-primary rounded-pill">{{ order.status_text || 'In transit' }}</span>
+        <span class="fw-bold"><i class="bi bi-truck me-2"></i>{{ order.type }}</span>
+        <span class="badge bg-secondary rounded-pill fw-normal">{{ order.status_string }}</span>
       </div>
 
-      <!-- Destinos (Pickup / Dropoff) -->
-      <div class="small mb-3 ps-2 border-start border-secondary">
-        <div class="mb-2">
-          <small class="text-muted d-block">PICKUP</small>
-          <div><strong>{{ order.pickup?.city || 'New York' }}</strong></div>
-          <small class="text-muted">{{ order.pickup?.address }}</small>
+      <!-- Destinos (Pickup & Dropoff) -->
+      <div class="small mb-3 ps-2 border-start border-secondary" *ngIf="order.destinations && order.destinations.length >= 2">
+        <!-- Pickup -->
+        <div class="mb-3">
+          <small class="text-muted d-block fw-bold" style="font-size: 10px;">PICKUP</small>
+          <div class="text-truncate"><strong>{{ order.destinations[0].nickname || 'Recolección' }}</strong></div>
+          <small class="text-muted d-block text-truncate">{{ order.destinations[0].address }}</small>
+          <small class="text-muted">{{ order.destinations[0].start_date | date:'dd/MM/yy HH:mm' }}</small>
         </div>
+
+        <!-- Dropoff -->
         <div>
-          <small class="text-muted d-block">DROPOFF</small>
-          <div><strong>{{ order.dropoff?.city || 'New York' }}</strong></div>
-          <small class="text-muted">{{ order.dropoff?.address }}</small>
+          <small class="text-muted d-block fw-bold" style="font-size: 10px;">DROPOFF</small>
+          <div class="text-truncate"><strong>{{ order.destinations[1].nickname || 'Entrega' }}</strong></div>
+          <small class="text-muted d-block text-truncate">{{ order.destinations[1].address }}</small>
+          <small class="text-muted">{{ order.destinations[1].start_date | date:'dd/MM/yy HH:mm' }}</small>
         </div>
       </div>
 
-      <!-- 2. Botón con temporizador & 3. Botón Resume -->
-      <div class="d-flex justify-content-between align-items-center mt-3">
+      <!-- Acciones (2. Botón Navegar / Temporizador & 3. Botón Resume) -->
+      <div class="d-flex justify-content-between align-items-center mt-3 pt-2 border-top border-secondary">
+        <!-- Temporizador / Botón de Navegar -->
         <button 
-          class="btn btn-sm btn-outline-light rounded-pill px-3" 
+          class="btn btn-sm rounded-pill px-3" 
+          [ngClass]="isPickupReady(order.start_date) ? 'btn-yellow' : 'btn-outline-light'"
           [disabled]="!isPickupReady(order.start_date)"
           (click)="onStartPickup(order)"
         >
           <span *ngIf="!isPickupReady(order.start_date)">Start pickup in {{ getRemainingTime(order.start_date) }}</span>
-          <span *ngIf="isPickupReady(order.start_date)">Its time for pickup</span>
+          <span *ngIf="isPickupReady(order.start_date)">Start pickup</span>
         </button>
 
-        <button class="btn btn-yellow btn-sm px-3" (click)="goToDetails(order.id)">
+        <!-- Botón Resume para navegar al detalle -->
+        <button class="btn btn-yellow btn-sm px-3 ms-2" (click)="goToDetails(order._id)">
           Resume <i class="bi bi-eye-fill ms-1"></i>
         </button>
       </div>
+
     </div>
   </div>
 </div>

@@ -1,50 +1,71 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ActivatedRoute } from '@angular/router';
-import { OrderService } from '../../../core/services/order'; 
+import { ActivatedRoute, RouterModule } from '@angular/router';
+import { OrderService } from '../../../core/services/order';
 
 @Component({
   selector: 'app-order-detail',
   standalone: true,
-  imports: [CommonModule],
-  templateUrl: './order-detail.component.html'
+  imports: [CommonModule, RouterModule],
+  templateUrl: './order-detail.html'
 })
 export class OrderDetailComponent implements OnInit {
   order: any = null;
-  selectedDestination: 'pickup' | 'dropoff' = 'pickup'; // 1. Switch state
-  isPanelExpanded: boolean = false; // 4. Accordion state
+  selectedDestinationIndex: number = 0; // 0 = Pickup, 1 = Dropoff
+  isPanelExpanded: boolean = false;
+  isLoading: boolean = true;
 
   constructor(
     private route: ActivatedRoute,
-    private orderService: OrderService
+    private orderService: OrderService,
+    private cdr: ChangeDetectorRef // 1. Inyectamos ChangeDetectorRef
   ) {}
 
   ngOnInit(): void {
-    const id = this.route.snapshot.paramMap.get('id');
-    if (id) {
-      this.orderService.getAllOrders().subscribe((orders: any[]) => {
-        this.order = orders.find(o => o.id == id) || orders[0];
-      });
-    }
+    // 2. Nos suscribimos a los parámetros de la ruta para reaccionar al cambio
+    this.route.params.subscribe(() => {
+      this.fetchOrderDetail();
+    });
   }
 
-  // 1. Cambia entre Pickup y Dropoff
-  selectDestination(type: 'pickup' | 'dropoff'): void {
-    this.selectedDestination = type;
+  fetchOrderDetail(): void {
+    this.isLoading = true;
+    
+    this.orderService.getAllOrders().subscribe({
+      next: (response: any) => {
+        // Asignamos la respuesta
+        this.order = response?.result || response;
+        this.isLoading = false;
+        
+        // 3. Forzamos la detección de cambios para renderizar el HTML de inmediato
+        this.cdr.detectChanges();
+      },
+      error: (err) => {
+        console.error('Error cargando el detalle:', err);
+        this.isLoading = false;
+        this.cdr.detectChanges();
+      }
+    });
   }
 
-  // 3. Botón Track Order solo activo si status >= 3
+  selectDestination(index: number): void {
+    this.selectedDestinationIndex = index;
+  }
+
+  get currentDestination(): any {
+    return this.order?.destinations?.[this.selectedDestinationIndex] || null;
+  }
+
   isTrackEnabled(): boolean {
-    return (this.order?.status_code || 0) >= 3;
+    return (this.order?.status || 0) >= 3;
   }
 
   onTrackOrder(): void {
     if (this.isTrackEnabled()) {
-      console.log("Track Order");
+      console.log("Track Order clickeado");
     }
   }
 
-  // 4. Conmutar panel desplegable
   togglePanel(): void {
     this.isPanelExpanded = !this.isPanelExpanded;
   }
