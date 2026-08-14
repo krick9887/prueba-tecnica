@@ -1,1 +1,30 @@
-<p>order-list works!</p>
+<div class="container py-4">
+  <h2 class="mb-4 font-weight-bold">Pedidos</h2>
+
+  <!-- Spinner de carga -->
+  <div *ngIf="isLoading" class="text-center my-5">
+    <div class="spinner-border text-primary" role="status">
+      <span class="visually-hidden">Cargando...</span>
+    </div>
+  </div>
+
+  <!-- Mensaje de error -->
+  <div *ngIf="errorMsg" class="alert alert-danger" role="alert">
+    {{ errorMsg }}
+  </div>
+
+  <!-- Lista con Grid de Bootstrap (Responsive) -->
+  <div *ngIf="!isLoading && orders.length > 0" class="row g-3">
+    <div *ngFor="let order of orders" class="col-12 col-md-6 col-lg-4">
+      <div class="card h-100 border-0 shadow-sm p-3">
+        <div class="d-flex align-items-center">
+          <app-avatar [imageUrl]="order.image" [name]="order.name || order.customerName || 'Cliente'" [size]="55"></app-avatar>
+          <div class="ms-3">
+            <h6 class="mb-1 fw-bold">{{ order.name || order.customerName || 'Pedido sin nombre' }}</h6>
+            <p class="text-muted small mb-0">{{ order.description || order.status || 'Sin detalle' }}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

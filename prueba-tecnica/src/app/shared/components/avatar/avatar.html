@@ -1,1 +1,8 @@
-<p>avatar works!</p>
+<img 
+  [src]="imageUrl || ('https://ui-avatars.com/api/?name=' + name + '&background=0D6EFD&color=fff')" 
+  [alt]="name"
+  (error)="onImageError($event)"
+  class="rounded-circle object-fit-cover shadow-sm"
+  [style.width.px]="size"
+  [style.height.px]="size"
+>
