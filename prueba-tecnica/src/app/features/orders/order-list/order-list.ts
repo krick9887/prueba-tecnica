@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -18,12 +18,18 @@ export class OrderListComponent implements OnInit, OnDestroy {
   activeTab: string = 'upcoming';
   timerInterval: any;
 
-  constructor(private orderService: OrderService, private router: Router) {}
+  constructor(
+    private orderService: OrderService, 
+    private router: Router,
+    private cdr: ChangeDetectorRef
+  ) {}
 
   ngOnInit(): void {
     this.fetchOrders();
-    // Re-evalúa el contador cada segundo
-    this.timerInterval = setInterval(() => {}, 1000);
+    // Hacemos que el contador de tiempo restante se actualice en la vista.
+    this.timerInterval = setInterval(() => {
+      this.cdr.markForCheck();
+    }, 1000);
   }
 
   ngOnDestroy(): void {
@@ -37,8 +43,19 @@ export class OrderListComponent implements OnInit, OnDestroy {
 
     request.subscribe({
       next: (response: any) => {
-        // Obtenemos el arreglo desde response.result
-        this.orders = response?.result || [];
+        let ordersData: any[] = [];
+        // Caso 1: La respuesta es un objeto con una propiedad 'result' que es un array.
+        if (Array.isArray(response?.result)) {
+          ordersData = response.result;
+        // Caso 2: La respuesta es directamente el array de órdenes.
+        } else if (Array.isArray(response)) {
+          ordersData = response;
+        // Caso 3: La respuesta es un objeto con una propiedad 'result' que es un solo objeto de orden.
+        } else if (response?.result && typeof response.result === 'object' && !Array.isArray(response.result)) {
+          // Lo convertimos en un array de un solo elemento para poder mostrarlo en la lista.
+          ordersData = [response.result];
+        }
+        this.orders = ordersData;
         this.applyFilter();
       },
       error: (err) => {
@@ -86,6 +103,10 @@ export class OrderListComponent implements OnInit, OnDestroy {
 
   // 3. Ir al detalle
   goToDetails(orderId: string): void {
+    if (!orderId) {
+      return;
+    }
+
     this.router.navigate(['/orders', orderId]);
   }
 }

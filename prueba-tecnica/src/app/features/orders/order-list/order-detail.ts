@@ -1,6 +1,7 @@
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, RouterModule } from '@angular/router';
+import { forkJoin } from 'rxjs';
 import { OrderService } from '../../../core/services/order';
 
 @Component({
@@ -22,22 +23,50 @@ export class OrderDetailComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    // 2. Nos suscribimos a los parámetros de la ruta para reaccionar al cambio
-    this.route.params.subscribe(() => {
-      this.fetchOrderDetail();
+    // Nos suscribimos a `paramMap` para reaccionar a cambios en el ID de la ruta.
+    this.route.paramMap.subscribe(params => {
+      const orderId = params.get('id');
+      this.fetchOrderDetail(orderId);
     });
   }
 
-  fetchOrderDetail(): void {
+  fetchOrderDetail(orderId: string | null): void {
+    if (!orderId) {
+      this.isLoading = false;
+      this.order = null;
+      this.cdr.detectChanges();
+      return;
+    }
+
     this.isLoading = true;
-    
-    this.orderService.getAllOrders().subscribe({
-      next: (response: any) => {
-        // Asignamos la respuesta
-        this.order = response?.result || response;
+
+    forkJoin({
+      all: this.orderService.getAllOrders(),
+      upcoming: this.orderService.getUpcomingOrders()
+    }).subscribe({
+      next: ({ all, upcoming }) => {
+        const allOrders = [
+          ...this.normalizeOrders(all),
+          ...this.normalizeOrders(upcoming)
+        ];
+
+        const uniqueOrders = allOrders.filter((order, index, array) => {
+          const firstMatchIndex = array.findIndex((item) => {
+            const sameId = item?._id && order?._id && String(item._id) === String(order._id);
+            const sameNumber = item?.order_number && order?.order_number && String(item.order_number) === String(order.order_number);
+            return sameId || sameNumber;
+          });
+
+          return firstMatchIndex === index;
+        });
+
+        this.order = uniqueOrders.find((o) => {
+          const matchesId = o?._id && String(o._id) === String(orderId);
+          const matchesOrderNumber = o?.order_number && String(o.order_number) === String(orderId);
+          return matchesId || matchesOrderNumber;
+        }) ?? null;
+
         this.isLoading = false;
-        
-        // 3. Forzamos la detección de cambios para renderizar el HTML de inmediato
         this.cdr.detectChanges();
       },
       error: (err) => {
@@ -46,6 +75,26 @@ export class OrderDetailComponent implements OnInit {
         this.cdr.detectChanges();
       }
     });
+  }
+
+  private normalizeOrders(response: any): any[] {
+    if (Array.isArray(response?.result)) {
+      return response.result;
+    }
+
+    if (Array.isArray(response)) {
+      return response;
+    }
+
+    if (response?.result && typeof response.result === 'object') {
+      return [response.result];
+    }
+
+    if (response && typeof response === 'object') {
+      return [response];
+    }
+
+    return [];
   }
 
   selectDestination(index: number): void {
