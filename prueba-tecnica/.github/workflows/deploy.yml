@@ -28,13 +28,37 @@ jobs:
         with:
           node-version: 22
 
-      - name: Install dependencies
-        run: npm install
-        working-directory: ./prueba-tecnica
+      - name: Debug workspace
+        run: |
+          echo "Workspace root: $(pwd)"
+          echo "Top-level files:"; ls -la || true
+          echo "prueba-tecnica/ files:"; ls -la prueba-tecnica || true
 
-      - name: Build Angular App
-        run: npx ng build --base-href=/prueba-tecnica/
-        working-directory: ./prueba-tecnica
+      - name: Install dependencies (auto-detect)
+        run: |
+          if [ -f package.json ]; then
+            echo "Found package.json at repo root";
+            npm ci;
+          elif [ -f ./prueba-tecnica/package.json ]; then
+            echo "Found package.json in ./prueba-tecnica";
+            cd ./prueba-tecnica && npm ci;
+          else
+            echo "package.json not found in repo root or ./prueba-tecnica";
+            ls -la || true;
+            exit 1;
+          fi
+
+      - name: Build Angular App (auto-detect)
+        run: |
+          if [ -f package.json ]; then
+            echo "Building from repo root";
+            npx ng build --base-href=/prueba-tecnica/;
+          elif [ -f ./prueba-tecnica/package.json ]; then
+            echo "Building from ./prueba-tecnica";
+            cd ./prueba-tecnica && npx ng build --base-href=/prueba-tecnica/;
+          else
+            echo "package.json not found for build"; exit 1;
+          fi
 
       - name: Setup Pages
         uses: actions/configure-pages@v5
