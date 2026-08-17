@@ -30,9 +30,11 @@ jobs:
 
       - name: Install dependencies
         run: npm install
+        working-directory: ./prueba-tecnica
 
       - name: Build Angular App
         run: npx ng build --base-href=/prueba-tecnica/
+        working-directory: ./prueba-tecnica
 
       - name: Setup Pages
         uses: actions/configure-pages@v5
@@ -40,7 +42,7 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: 'dist/prueba-tecnica/browser'
+          path: 'prueba-tecnica/dist/prueba-tecnica/browser'
 
       - name: Deploy to GitHub Pages
         id: deployment
