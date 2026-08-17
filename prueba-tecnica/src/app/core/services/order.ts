@@ -20,6 +20,7 @@ export class OrderService {
   getAllOrders(): Observable<Order[]> {
     return from(this.fetchJson<Order[]>(this.baseUrl));
   }
+  
 
   getUpcomingOrders(): Observable<Order[]> {
     return from(this.fetchJson<Order[]>(`${this.baseUrl}/upcoming`));
