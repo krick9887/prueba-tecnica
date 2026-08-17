@@ -42,7 +42,7 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: 'prueba-tecnica/dist/prueba-tecnica/browser'
+          path: 'prueba-tecnica/dist/prueba-tecnica'
 
       - name: Deploy to GitHub Pages
         id: deployment
