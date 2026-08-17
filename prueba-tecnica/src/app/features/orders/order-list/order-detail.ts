@@ -1,6 +1,6 @@
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ActivatedRoute, RouterModule } from '@angular/router';
+import { ActivatedRoute, RouterModule, Router } from '@angular/router';
 import { forkJoin } from 'rxjs';
 import { OrderService } from '../../../core/services/order';
 
@@ -19,11 +19,11 @@ export class OrderDetailComponent implements OnInit {
   constructor(
     private route: ActivatedRoute,
     private orderService: OrderService,
-    private cdr: ChangeDetectorRef // 1. Inyectamos ChangeDetectorRef
+    private cdr: ChangeDetectorRef, // 1. Inyectamos ChangeDetectorRef
+    private router: Router
   ) {}
 
-  ngOnInit(): void {
-    // Nos suscribimos a `paramMap` para reaccionar a cambios en el ID de la ruta.
+  ngOnInit(): void {
     this.route.paramMap.subscribe(params => {
       const orderId = params.get('id');
       this.fetchOrderDetail(orderId);
@@ -117,5 +117,11 @@ export class OrderDetailComponent implements OnInit {
 
   togglePanel(): void {
     this.isPanelExpanded = !this.isPanelExpanded;
+  }
+  onBack(): void {
+    this.orderService.getUpcomingOrders().subscribe({
+      next: () => this.router.navigate(['/']),
+      error: () => this.router.navigate(['/'])
+    });
   }
 }

@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="32" height="32" fill="none">
+  <!-- Línea de velocidad / Estela trasera (Amarillo) -->
+  <path d="M 3 24 L 7 24" stroke="#FFE600" stroke-width="2" stroke-linecap="round" />
+
+  <!-- Detalle amarillo en acople / quinta rueda -->
+  <circle cx="12" cy="18" r="1" fill="#FFE600" />
+
+  <!-- Faro delantero (Amarillo) -->
+  <path d="M 28 20 L 30 20" stroke="#FFE600" stroke-width="2" stroke-linecap="round" />
+
+  <!-- Silueta principal del camión (Blanco) -->
+  <!-- Tubo de escape trasero -->
+  <path d="M 11 10 C 11 6, 12 5, 14 5" stroke="#FFFFFF" stroke-width="1.8" stroke-linecap="round" />
+  
+  <!-- Cabina y chasís -->
+  <path d="M 8 22 H 15 V 8 C 15 6, 17 5, 20 5 H 22 C 24 5, 25 7, 25 10 V 13 L 28 16 C 29 17, 29 18, 29 20 V 22 C 29 23, 28 24, 27 24 H 24" 
+        stroke="#FFFFFF" 
+        stroke-width="1.8" 
+        stroke-linecap="round" 
+        stroke-linejoin="round" />
+  
+  <!-- Chasis inferior trasero y acople -->
+  <path d="M 7 24 H 8 M 12 24 H 19" stroke="#FFFFFF" stroke-width="1.8" stroke-linecap="round" />
+  <path d="M 13 14 H 15" stroke="#FFFFFF" stroke-width="1.8" stroke-linecap="round" />
+
+  <!-- Ventana lateral y detalle amarillo (Ventana/Espejo) -->
+  <path d="M 18 8 H 22 C 23 8, 23.5 9, 23.5 10 V 13 H 18 Z" stroke="#FFFFFF" stroke-width="1.5" stroke-linejoin="round" />
+  <circle cx="21" cy="11" r="1.5" fill="#FFE600" />
+
+  <!-- Ruedas traseras (Blanco) -->
+  <circle cx="9" cy="24" r="2" stroke="#FFFFFF" stroke-width="1.8" />
+  <circle cx="13" cy="24" r="2" stroke="#FFFFFF" stroke-width="1.8" />
+
+  <!-- Rueda delantera (Blanco) -->
+  <circle cx="22" cy="24" r="2" stroke="#FFFFFF" stroke-width="1.8" />
+</svg>

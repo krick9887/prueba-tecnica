@@ -1,62 +1,96 @@
 <div class="container py-4 text-white" style="max-width: 480px;">
-  <!-- Header -->
+  
   <div class="d-flex justify-content-between align-items-center mb-3">
-    <i class="bi bi-chevron-left cursor-pointer"></i>
-    <h5 class="m-0 fw-bold">Cargo Orders</h5>
-    <i class="bi bi-bell text-yellow"></i>
+    <div style="width: 28px; display:flex; align-items:center; cursor:pointer;">
+       <svg width="30" height="30" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <path d="M14.5 5.5L7.5 12L14.5 18.5" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </div>
+    <h5 class="m-0 fw-bold text-center flex-grow-1">Cargo Orders</h5>
+    <div style="width: 36px; display:flex; justify-content:flex-end;">
+      <img src="/image/campana.svg" alt="Notificaciones" width="26" height="26" style="display:block; color: #facc15;" />
+    </div>
   </div>
 
-  <!-- Tabs -->
+  
   <div class="d-flex justify-content-around mb-3 border-bottom border-secondary pb-2">
     <span [class.text-yellow]="activeTab==='upcoming'" class="fw-bold cursor-pointer" (click)="activeTab='upcoming'; fetchOrders()">Upcoming</span>
-    <span [class.text-yellow]="activeTab==='completed'" class="text-muted cursor-pointer" (click)="activeTab='completed'; fetchOrders()">Completed</span>
-    <span [class.text-yellow]="activeTab==='past'" class="text-muted cursor-pointer" (click)="activeTab='past'; fetchOrders()">Past</span>
+    <span [class.text-yellow]="activeTab==='completed'" class="text-white cursor-pointer" (click)="activeTab='completed'; fetchOrders()">Completed</span>
+    <span [class.text-yellow]="activeTab==='past'" class="text-white cursor-pointer" (click)="activeTab='past'; fetchOrders()">Past</span>
   </div>
 
-  <!-- 1. Buscador por order_number -->
+  
   <div class="mb-4">
     <input 
       type="text" 
-      class="form-control bg-cargo-card text-white border-0 py-2 ps-3" 
-      placeholder="Search.." 
+      class="form-control bg-cargo-card border-0 py-2 search-input" 
+      [ngStyle]="{'background-image': 'url(/image/lupa.svg)'}"
+      placeholder="" 
       [(ngModel)]="searchTerm" 
       (input)="applyFilter()"
+      aria-label="Buscar órdenes"
     >
   </div>
 
-  <!-- Lista de Órdenes -->
+  
   <div *ngFor="let order of filteredOrders" class="mb-4">
-    <p class="small text-muted mb-2">Order <strong class="text-white">#{{ order.order_number }}</strong></p>
+    <p class="small text-gray mb-2">Order <strong class="text-white">#{{ order.order_number }}</strong></p>
 
     <div class="bg-cargo-card p-3">
-      <!-- Encabezado de la Tarjeta -->
+      
       <div class="d-flex justify-content-between align-items-center mb-3">
-        <span class="fw-bold"><i class="bi bi-truck me-2"></i>{{ order.type }}</span>
-        <span class="badge bg-secondary rounded-pill fw-normal">{{ order.status_string }}</span>
+        <span class="fw-bold">
+          <img *ngIf="order.type === 'FTL'" src="/image/cadena.png" alt="icon" class="icon-white me-2" style="width:18px; height:18px; object-fit:contain;"/>
+          {{ order.type }}
+        </span>
+        <span class="status-badge" [ngClass]="order.status_class || 'grey-dot-bg'">
+          <span class="status-dot"></span>
+          {{ order.status_string }}
+        </span>
       </div>
 
-      <!-- Destinos (Pickup & Dropoff) -->
-      <div class="small mb-3 ps-2 border-start border-secondary" *ngIf="order.destinations && order.destinations.length >= 2">
-        <!-- Pickup -->
-        <div class="mb-3">
-          <small class="text-muted d-block fw-bold" style="font-size: 10px;">PICKUP</small>
-          <div class="text-truncate"><strong>{{ order.destinations[0].nickname || 'Recolección' }}</strong></div>
-          <small class="text-muted d-block text-truncate">{{ order.destinations[0].address }}</small>
-          <small class="text-muted">{{ order.destinations[0].start_date | date:'dd/MM/yy HH:mm' }}</small>
+      
+      <div class="small mb-3 d-flex" *ngIf="order.destinations && order.destinations.length >= 2">
+        
+        <div style="width:40px; display:flex; flex-direction:column; align-items:center;">
+          <img src="/image/envio.svg" alt="envio" style="width:18px; height:18px; margin-top:4px;" />
+          <div style="flex:1; width:2px; margin:6px 0; background: linear-gradient(to bottom, rgba(255,255,255,0.2), rgba(255,255,255,0.9), rgba(255,255,255,0.2)); border-radius:999px; min-height:28px;"></div>
+          <img src="/image/ubicacion.svg" alt="ubicacion" style="width:18px; height:18px; margin-bottom:4px;" />
         </div>
 
-        <!-- Dropoff -->
-        <div>
-          <small class="text-muted d-block fw-bold" style="font-size: 10px;">DROPOFF</small>
-          <div class="text-truncate"><strong>{{ order.destinations[1].nickname || 'Entrega' }}</strong></div>
-          <small class="text-muted d-block text-truncate">{{ order.destinations[1].address }}</small>
-          <small class="text-muted">{{ order.destinations[1].start_date | date:'dd/MM/yy HH:mm' }}</small>
+        
+        <div class="flex-grow-1 ps-3">
+          <div class="mb-2">
+            <small class="text-gray d-block fw-bold" style="font-size: 10px;">PICKUP</small>
+            <div class="text-truncate"><strong>{{ order.destinations[0].nickname || 'Recolección' }}</strong></div>
+            <div class="d-flex align-items-start">
+              <div class="flex-grow-1" style="min-width:0; overflow:hidden;">
+                <small class="text-gray d-block mb-0" style="display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; text-overflow:ellipsis; line-height:1.2; max-height:2.4em; word-break:break-word;">{{ order.destinations[0].address }}</small>
+              </div>
+              <div class="ms-3 text-nowrap" style="flex-shrink:0;">
+                <small class="text-gray">{{ order.destinations[0].start_date | date:'dd/MM/yy HH:mm' }}</small>
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <small class="text-gray d-block fw-bold" style="font-size: 10px;">DROPOFF</small>
+            <div class="text-truncate"><strong>{{ order.destinations[1].nickname || 'Entrega' }}</strong></div>
+            <div class="d-flex align-items-start">
+              <div class="flex-grow-1" style="min-width:0; overflow:hidden;">
+                <small class="text-gray d-block mb-0" style="display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; text-overflow:ellipsis; line-height:1.2; max-height:2.4em; word-break:break-word;">{{ order.destinations[1].address }}</small>
+              </div>
+              <div class="ms-3 text-nowrap" style="flex-shrink:0;">
+                <small class="text-gray">{{ order.destinations[1].start_date | date:'dd/MM/yy HH:mm' }}</small>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
 
-      <!-- Acciones (2. Botón Navegar / Temporizador & 3. Botón Resume) -->
+      
       <div class="d-flex justify-content-between align-items-center mt-3 pt-2 border-top border-secondary">
-        <!-- Temporizador / Botón de Navegar -->
+        
         <button 
           class="btn btn-sm rounded-pill px-3" 
           [ngClass]="isPickupReady(order.start_date) ? 'btn-yellow' : 'btn-outline-light'"
@@ -67,9 +101,10 @@
           <span *ngIf="isPickupReady(order.start_date)">Start pickup</span>
         </button>
 
-        <!-- Botón Resume para navegar al detalle -->
-        <button class="btn btn-yellow btn-sm px-3 ms-2" (click)="goToDetails(order._id)">
-          Resume <i class="bi bi-eye-fill ms-1"></i>
+        
+        <button class="btn btn-yellow btn-sm px-3 ms-2 d-inline-flex align-items-center" (click)="goToDetails(order._id)">
+          <span>Resume</span>
+          <img src="/image/ojo.png" alt="Ver detalle" style="width: 14px; height: 14px; object-fit: contain; margin-left: 0.4rem;" />
         </button>
       </div>
 

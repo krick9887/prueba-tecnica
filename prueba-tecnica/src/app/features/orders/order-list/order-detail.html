@@ -1,18 +1,31 @@
 <div class="container py-4 text-white" style="max-width: 480px;" *ngIf="order">
   
-  <!-- Barra Superior -->
-  <div class="d-flex justify-content-between align-items-center mb-3">
-    <i class="bi bi-chevron-left cursor-pointer" routerLink="/"></i>
-    <h5 class="m-0 fw-bold">Cargo Details</h5>
-    <i class="bi bi-bell text-yellow"></i>
+  
+  <div class="d-flex align-items-center justify-content-between mb-3">
+    <button
+      type="button"
+      (click)="onBack()"
+      aria-label="Regresar"
+      style="all: unset; display: flex; align-items: center; justify-content: center; width: 32px; height: 32px; color: #ffffff; cursor: pointer; background: transparent;"
+    >
+      <svg width="30" height="30" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <path d="M14.5 5.5L7.5 12L14.5 18.5" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </button>
+
+    <h5 class="m-0 fw-bold text-center flex-grow-1">Cargo Details</h5>
+
+    <button class="btn btn-link p-0 d-flex align-items-center border-0" type="button" aria-label="Notificaciones" style="color: #facc15 !important; line-height: 1; background: transparent;">
+      <img src="/image/campana.svg" alt="Notificaciones" width="26" height="26" style="display:block;" />
+    </button>
   </div>
 
-  <!-- Card Superior con Switch Pickup (0) / Dropoff (1) -->
+  
   <div class="bg-cargo-card p-3 mb-4">
-    <small class="text-muted">Referencia {{ order.reference_number }}</small>
+    <small class="text-gray">Referencia {{ order.reference_number }}</small>
     <h6 class="fw-bold mb-3">Order #{{ order.order_number }}</h6>
 
-    <!-- 1.- Switch de Pickup -->
+    
     <div 
       class="p-2 mb-2 rounded cursor-pointer border-secondary" 
       [class.border]="selectedDestinationIndex === 0"
@@ -20,16 +33,16 @@
       *ngIf="order.destinations && order.destinations[0]"
     >
       <div class="d-flex align-items-center">
-        <i class="bi bi-geo-alt-fill me-2" [ngClass]="selectedDestinationIndex === 0 ? 'text-yellow' : 'text-muted'"></i>
+        <i class="bi bi-geo-alt-fill me-2" [ngClass]="selectedDestinationIndex === 0 ? 'text-yellow' : 'text-gray'"></i>
         <div class="text-truncate">
-          <small class="text-muted d-block font-weight-bold" style="font-size: 10px;">PICKUP</small>
+          <small class="text-gray d-block font-weight-bold" style="font-size: 10px;">PICKUP</small>
           <strong>{{ order.destinations[0].nickname || 'Recolección' }}</strong>
-          <small class="d-block text-muted text-truncate">{{ order.destinations[0].address }}</small>
+          <small class="d-block text-gray text-truncate">{{ order.destinations[0].address }}</small>
         </div>
       </div>
     </div>
 
-    <!-- 1.- Switch de Dropoff -->
+    
     <div 
       class="p-2 rounded cursor-pointer border-secondary" 
       [class.border]="selectedDestinationIndex === 1"
@@ -37,67 +50,122 @@
       *ngIf="order.destinations && order.destinations[1]"
     >
       <div class="d-flex align-items-center">
-        <i class="bi bi-geo-alt-fill me-2" [ngClass]="selectedDestinationIndex === 1 ? 'text-yellow' : 'text-muted'"></i>
+        <i class="bi bi-geo-alt-fill me-2" [ngClass]="selectedDestinationIndex === 1 ? 'text-yellow' : 'text-gray'"></i>
         <div class="text-truncate">
-          <small class="text-muted d-block font-weight-bold" style="font-size: 10px;">DROPOFF</small>
+          <small class="text-gray d-block font-weight-bold" style="font-size: 10px;">DROPOFF</small>
           <strong>{{ order.destinations[1].nickname || 'Entrega' }}</strong>
-          <small class="d-block text-muted text-truncate">{{ order.destinations[1].address }}</small>
+          <small class="d-block text-gray text-truncate">{{ order.destinations[1].address }}</small>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- Timeline de Estados & Avatar del Conductor -->
-  <div class="bg-cargo-card p-4 text-center mb-4">
-    
-    <!-- 2.- Avatar de Usuario con fallback predeterminado -->
-    <img 
-      [src]="order.driver?.thumbnail || ('https://ui-avatars.com/api/?name=' + (order.driver?.nickname || 'Driver') + '&background=facc15&color=000')" 
-      (error)="img.src='https://ui-avatars.com/api/?name=Driver&background=facc15&color=000'"
-      class="rounded-circle mb-2" 
-      style="width: 70px; height: 70px; object-fit: cover;"
-      #img
-    >
-    <div class="fw-bold mb-3">{{ order.driver?.nickname || 'Conductor asignado' }}</div>
-
-    <!-- Lista de Estados (Timeline) -->
-    <div class="text-start ps-4 border-start border-secondary ms-4 my-3" *ngIf="order.status_list">
-      <!-- Mapea estados de Pickup o Dropoff según el tab activo -->
-      <ng-container *ngIf="selectedDestinationIndex === 0">
-        <div *ngFor="let item of order.status_list.pickup" class="mb-3 d-flex align-items-center">
-          <i class="bi" [ngClass]="item.active ? 'bi-check-circle-fill text-yellow' : 'bi-circle text-muted'"></i>
-          <span class="ms-2" [class.text-muted]="!item.active">{{ item.status }}</span>
-        </div>
-      </ng-container>
-
-      <ng-container *ngIf="selectedDestinationIndex === 1">
-        <div *ngFor="let item of order.status_list.dropoff" class="mb-3 d-flex align-items-center">
-          <i class="bi" [ngClass]="item.active ? 'bi-check-circle-fill text-yellow' : 'bi-circle text-muted'"></i>
-          <span class="ms-2" [class.text-muted]="!item.active">{{ item.status }}</span>
-        </div>
-      </ng-container>
+  
+  <div class="bg-cargo-card p-3 mb-4 text-center" style="position: relative; overflow: visible;">
+  
+  
+  <div class="d-flex justify-content-center" style="margin-top: -46px; margin-bottom: 0.5rem; position: relative; z-index: 2; padding-top: 6px;">
+    <div class="rounded-circle p-1" style="background-color: #1a1d21; box-shadow: 0 6px 12px rgba(0,0,0,0.18); border: 2px solid #181b20;">
+      <img 
+        [src]="order.driver?.thumbnail || ('https://ui-avatars.com/api/?name=' + (order.driver?.nickname || 'Driver') + '&background=facc15&color=000')" 
+        (error)="img.src='https://ui-avatars.com/api/?name=Driver&background=facc15&color=000'"
+        class="rounded-circle" 
+        style="width: 70px; height: 70px; object-fit: cover; display:block;"
+        #img
+      >
     </div>
+  </div>
 
-    <!-- 3.- Botón Track Order (Activo solo si status >= 3) -->
+  
+  <div class="fw-bold fs-5 mb-4 text-white">10:30 PM</div>
+
+  
+  <div class="position-relative text-start mb-4 mx-auto" style="max-width: 240px;" *ngIf="order.status_list">
+    
+    <ng-container *ngIf="selectedDestinationIndex === 0">
+      <div *ngFor="let item of order.status_list.pickup; let i = index; let last = last" class="position-relative d-flex align-items-center" style="min-height: 44px;">
+        
+        
+        <div 
+          *ngIf="!last" 
+          class="position-absolute" 
+          [style.background-color]="item.active ? '#ffe600' : '#4a4d52'"
+          style="left: 11px; top: 24px; bottom: -20px; width: 2px; z-index: 0;">
+        </div>
+
+        
+        <div class="position-relative me-3 d-flex align-items-center justify-content-center" style="width: 24px; height: 24px; z-index: 1;">
+          
+          
+          <div *ngIf="item.active" class="rounded-circle d-flex align-items-center justify-content-center" style="width: 24px; height: 24px; background-color: #ffe600;">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="20 6 9 17 4 12"></polyline>
+            </svg>
+          </div>
+
+          
+          <div *ngIf="!item.active" class="rounded-circle d-flex align-items-center justify-content-center" style="width: 22px; height: 22px; border: 2px solid #5a5d64; background-color: transparent;">
+            <div class="rounded-circle" style="width: 8px; height: 8px; background-color: #8a8d93;"></div>
+          </div>
+
+        </div>
+
+        
+        <div>
+          <span class="fw-medium" [style.color]="item.active ? '#ffffff' : '#5a5d64'" style="font-size: 0.95rem;">
+            {{ item.status }}
+          </span>
+        </div>
+
+      </div>
+    </ng-container>
+
+  </div>
+
+  
+  <div style="margin: 0 -1.25rem -1.25rem; border-radius: 0 0 16px 16px; overflow: hidden;">
     <button 
-      class="btn btn-yellow w-100 py-2 mt-3" 
+      class="btn w-100 py-3 fw-bold fs-6 border-0 rounded-0" 
+      [style.background-color]="isTrackEnabled() ? '#ffe600' : '#262930'"
+      [style.color]="isTrackEnabled() ? '#000000' : '#5a5d64'"
       [disabled]="!isTrackEnabled()"
       (click)="onTrackOrder()"
+      style="letter-spacing: 0.3px; border-radius: 0 0 16px 16px; margin: 0;"
     >
       Track Order
     </button>
   </div>
 
-  <!-- 4.- Panel Expandible (Pickup / Dropoff Data) -->
+</div>
+
+  
   <div class="bg-cargo-card p-3" *ngIf="currentDestination">
-    <div class="d-flex justify-content-between align-items-center cursor-pointer" (click)="togglePanel()">
+    <div class="d-flex justify-content-between align-items-center cursor-pointer" (click)="togglePanel()" [attr.aria-expanded]="isPanelExpanded">
       <span class="fw-bold">{{ selectedDestinationIndex === 0 ? 'Pickup Data' : 'Dropoff Data' }}</span>
-      <i class="bi" [ngClass]="isPanelExpanded ? 'bi-chevron-up' : 'bi-chevron-down'"></i>
+      <svg
+        width="16"
+        height="16"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2.2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        [style.transform]="isPanelExpanded ? 'rotate(0deg)' : 'rotate(180deg)'"
+        [style.transition]="'transform 0.2s ease'"
+        [style.display]="'inline-block'"
+        style="color: #ffffff;"
+        aria-hidden="true"
+      >
+        <path d="M6 9l6 6 6-6"/>
+      </svg>
     </div>
 
-    <!-- Contenido que se oculta o muestra al dar click -->
-    <div *ngIf="isPanelExpanded" class="mt-3 pt-3 border-top border-secondary small text-muted">
-      <p class="mb-1 text-white fw-semibold">{{ currentDestination.contact_info?.name || 'Contacto no especificado' }}</p>
+    
+    <div *ngIf="isPanelExpanded" class="mt-3 pt-3 border-top border-secondary small text-gray">
+      <div class="d-flex align-items-center justify-content-between mb-2">
+        <p class="mb-0 text-white fw-semibold">{{ currentDestination.contact_info?.name || 'Contacto no especificado' }}</p>
+      </div>
       <p class="mb-1">{{ currentDestination.address }}</p>
       <p class="mb-1">{{ currentDestination.startDate | date:'dd de MMMM yyyy • HH:mm' }}</p>
       <p class="mb-1" *ngIf="currentDestination.contact_info?.telephone">{{ currentDestination.contact_info?.telephone }}</p>

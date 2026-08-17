@@ -32,3 +32,83 @@ body {
 .text-yellow {
   color: var(--yellow-accent) !important;
 }
+
+.text-gray {
+  color: var(--text-muted) !important;
+}
+
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.3rem 0.75rem;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.04);
+  color: #ffffff;
+  font-size: 0.72rem;
+  font-weight: 500;
+  line-height: 1.2;
+}
+
+.status-dot {
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 50%;
+  display: inline-block;
+  flex-shrink: 0;
+  background: currentColor;
+}
+
+.blue-dot-bg {
+  color: #4ea8ff;
+}
+
+.grey-dot-bg {
+  color: #9aa3ad;
+}
+
+.yellow-dot-bg {
+  color: #facc15;
+}
+
+.green-dot-bg {
+  color: #34d399;
+}
+
+.red-dot-bg {
+  color: #f87171;
+}
+
+
+.search-input {
+  background-repeat: no-repeat;
+  background-position: 12px center;
+  background-size: 18px 18px;
+  padding-left: 44px !important;
+  color: #ffffff !important;
+  caret-color: #ffffff !important;
+}
+
+.search-input::placeholder {
+  color: var(--text-muted) !important;
+}
+
+
+.search-input:focus,
+.search-input:active {
+  background-color: var(--card-dark) !important;
+  color: #ffffff !important;
+  caret-color: #ffffff !important;
+  -webkit-text-fill-color: #ffffff !important;
+  box-shadow: none !important;
+  outline: none !important;
+  border-color: transparent !important;
+}
+
+
+.icon-white {
+  display: inline-block;
+  vertical-align: middle;
+  
+  filter: invert(1) brightness(2) saturate(0);
+}
